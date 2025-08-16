@@ -15,6 +15,11 @@ module.exports = {
         "2xl": "1400px",
       },
     },
+    fontFamily: {
+      'inter': ['var(--font-inter)', 'sans-serif'],
+      'playfair': ['var(--font-playfair)', 'serif'],
+      'space-grotesk': ['var(--font-space-grotesk)', 'sans-serif'],
+    },
     extend: {
       colors: {
         border: "hsl(var(--border))",
@@ -65,10 +70,18 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
         },
+        "elegant-fade": {
+          from: { opacity: 0, transform: "translateY(10px)" },
+          to: { opacity: 1, transform: "translateY(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "elegant-fade": "elegant-fade 0.5s ease-in-out",
+      },
+      boxShadow: {
+        'premium': '0 10px 25px -5px rgba(59, 7, 100, 0.1), 0 5px 15px -5px rgba(59, 7, 100, 0.05)',
       },
     },
   },

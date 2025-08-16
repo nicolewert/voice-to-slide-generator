@@ -113,7 +113,7 @@ export function VoiceToSlideProcessor() {
                     Successfully generated {deck.totalSlides} slides from your audio!
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Deck: "{deck.title}" • Created {new Date(deck.createdAt).toLocaleString()}
+                    Deck: &ldquo;{deck.title}&rdquo; • Created {new Date(deck.createdAt).toLocaleString()}
                   </p>
                 </div>
               </div>

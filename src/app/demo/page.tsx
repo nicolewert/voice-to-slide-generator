@@ -67,7 +67,7 @@ export default function DemoPage() {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <h4 className="font-medium mb-2">✅ What's Working:</h4>
+                <h4 className="font-medium mb-2">✅ What&apos;s Working:</h4>
                 <ul className="space-y-1 text-muted-foreground">
                   <li>• File upload with validation</li>
                   <li>• Real-time processing status</li>

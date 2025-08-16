@@ -9,9 +9,10 @@ import { ErrorDisplay } from './ErrorDisplay'
 
 interface VoiceToSlideUploaderProps {
   onDeckCreated?: (deckId: string) => void
+  className?: string
 }
 
-export function VoiceToSlideUploader({ onDeckCreated }: VoiceToSlideUploaderProps) {
+export function VoiceToSlideUploader({ onDeckCreated, className }: VoiceToSlideUploaderProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
@@ -41,7 +42,7 @@ export function VoiceToSlideUploader({ onDeckCreated }: VoiceToSlideUploaderProp
           const result = await generateUploadUrl({})
           uploadUrl = result
           break
-        } catch (urlError) {
+        } catch {
           retryCount++
           if (retryCount >= maxRetries) {
             throw new Error('Failed to generate upload URL after multiple attempts')
@@ -146,7 +147,7 @@ export function VoiceToSlideUploader({ onDeckCreated }: VoiceToSlideUploaderProp
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${className || ''}`}>
       {/* Deck Title Input */}
       <div className="space-y-2">
         <label htmlFor="deck-title" className="text-sm font-medium text-gray-700">

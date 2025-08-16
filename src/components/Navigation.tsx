@@ -1,124 +1,138 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
+'use client'
+
+import React, { useState } from 'react';
+import Link from 'next/link';
 import { 
-    ChevronLeftIcon, 
-    ChevronRightIcon, 
-    MessageSquareIcon,
-    Download
+    Menu, 
+    X 
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from '@/components/ui/dialog';
 
-interface NavigationProps {
-    currentSlide: number;
-    totalSlides: number;
-    onPrevious: () => void;
-    onNext: () => void;
-    showSpeakerNotes: boolean;
-    onToggleSpeakerNotes: () => void;
-    showExportPanel?: boolean;
-    onToggleExportPanel?: () => void;
-}
+const NAV_ITEMS = [
+    { href: '/', label: 'Home' },
+    { href: '/create-deck', label: 'Create Deck' },
+    { href: '/recent-decks', label: 'Recent Decks' }
+];
 
-export const Navigation: React.FC<NavigationProps> = ({
-    currentSlide,
-    totalSlides,
-    onPrevious,
-    onNext,
-    showSpeakerNotes,
-    onToggleSpeakerNotes,
-    showExportPanel = false,
-    onToggleExportPanel
-}) => {
-    // Ensure 1-based slide numbering for display
-    const displayCurrentSlide = currentSlide + 1;
+export const Navigation: React.FC = () => {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
     return (
         <nav 
-            className="fixed bottom-0 left-0 right-0 p-4 bg-background/90 backdrop-blur-sm border-t border-muted/20 flex items-center justify-center space-x-6 z-50"
-            aria-label="Slide Navigation"
+            className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-sm border-b border-muted/20 px-4 md:px-8 py-4"
+            aria-label="Main Navigation"
         >
-            {/* Previous Button */}
-            <Button 
-                variant="outline" 
-                size="icon" 
-                onClick={onPrevious} 
-                disabled={currentSlide === 0}
-                className="group hover:bg-primary/10 transition-colors"
-                aria-label="Previous Slide"
-            >
-                <ChevronLeftIcon 
-                    className="h-5 w-5 text-primary group-disabled:text-muted/40" 
-                />
-                <span className="sr-only">Previous Slide (Shortcut: Left Arrow)</span>
-            </Button>
-
-            {/* Slide Counter */}
-            <div 
-                className="text-sm font-medium text-primary/80 tracking-wider"
-                aria-live="polite"
-                aria-atomic="true"
-            >
-                Slide {displayCurrentSlide} of {totalSlides}
-            </div>
-
-            {/* Next Button */}
-            <Button 
-                variant="outline" 
-                size="icon" 
-                onClick={onNext} 
-                disabled={currentSlide === totalSlides - 1}
-                className="group hover:bg-primary/10 transition-colors"
-                aria-label="Next Slide"
-            >
-                <ChevronRightIcon 
-                    className="h-5 w-5 text-primary group-disabled:text-muted/40" 
-                />
-                <span className="sr-only">Next Slide (Shortcut: Right Arrow)</span>
-            </Button>
-
-            {/* Speaker Notes Toggle */}
-            <Button 
-                variant={showSpeakerNotes ? 'default' : 'outline'}
-                size="icon"
-                onClick={onToggleSpeakerNotes}
-                className="group transition-colors"
-                aria-pressed={showSpeakerNotes}
-                aria-label={showSpeakerNotes ? 'Hide Speaker Notes' : 'Show Speaker Notes'}
-            >
-                <MessageSquareIcon 
-                    className={`h-5 w-5 ${
-                        showSpeakerNotes 
-                        ? 'text-background' 
-                        : 'text-primary group-hover:text-primary/80'
-                    }`} 
-                />
-            </Button>
-
-            {/* Export Panel Toggle */}
-            {onToggleExportPanel && (
-                <Button 
-                    variant={showExportPanel ? 'default' : 'outline'}
-                    size="icon"
-                    onClick={onToggleExportPanel}
-                    className="group transition-colors"
-                    aria-pressed={showExportPanel}
-                    aria-label={showExportPanel ? 'Hide Export Panel' : 'Show Export Panel'}
+            <div className="max-w-7xl mx-auto flex items-center justify-between">
+                {/* Logo/Brand */}
+                <Link 
+                    href="/" 
+                    className="text-2xl font-semibold font-playfair text-primary hover:text-primary/80 transition-colors"
+                    aria-label="Voice to Slides Home"
                 >
-                    <Download 
-                        className={`h-5 w-5 ${
-                            showExportPanel 
-                            ? 'text-background' 
-                            : 'text-primary group-hover:text-primary/80'
-                        }`} 
-                    />
-                </Button>
-            )}
+                    Voice to Slides
+                </Link>
 
-            {/* Keyboard Shortcut Hints */}
-            <div 
-                className="absolute bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-muted/60 hidden md:block"
-                aria-hidden="true"
-            >
-                Tip: Use ← → to navigate, S for notes, E for export
+                {/* Desktop Navigation */}
+                <div className="hidden md:flex items-center space-x-6">
+                    {NAV_ITEMS.map((item) => (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className="
+                                font-inter text-muted 
+                                hover:text-primary 
+                                transition-colors 
+                                font-medium
+                                relative 
+                                group
+                            "
+                        >
+                            {item.label}
+                            <span 
+                                className="
+                                    absolute 
+                                    bottom-[-4px] 
+                                    left-0 
+                                    w-full 
+                                    h-0.5 
+                                    bg-secondary 
+                                    scale-x-0 
+                                    group-hover:scale-x-100 
+                                    transition-transform 
+                                    origin-left
+                                "
+                            />
+                        </Link>
+                    ))}
+                </div>
+
+                {/* Mobile Navigation */}
+                <div className="md:hidden">
+                    <Dialog open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                        <DialogTrigger asChild>
+                            <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={toggleMobileMenu}
+                                aria-label="Toggle Mobile Menu"
+                            >
+                                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent 
+                            className="
+                                fixed 
+                                top-[72px] 
+                                right-4 
+                                left-4 
+                                w-[calc(100%-2rem)] 
+                                max-w-md 
+                                mx-auto 
+                                rounded-xl 
+                                shadow-2xl 
+                                bg-background/95 
+                                backdrop-blur-lg
+                            "
+                        >
+                            <DialogHeader>
+                                <DialogTitle className="text-center text-primary font-playfair">
+                                    Voice to Slides
+                                </DialogTitle>
+                            </DialogHeader>
+                            <div className="flex flex-col space-y-4 py-4">
+                                {NAV_ITEMS.map((item) => (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        onClick={toggleMobileMenu}
+                                        className="
+                                            w-full 
+                                            text-center 
+                                            py-3 
+                                            font-inter 
+                                            text-muted 
+                                            hover:text-primary 
+                                            hover:bg-primary/5 
+                                            rounded-lg 
+                                            transition-colors
+                                        "
+                                    >
+                                        {item.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
         </nav>
     );

@@ -7,10 +7,11 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const deckId = params.id as Id<'decks'>
+    const { id } = await params;
+    const deckId = id as Id<'decks'>
 
     if (!deckId) {
       return NextResponse.json({ error: 'Deck ID is required' }, { status: 400 })
