@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { 
     ChevronLeftIcon, 
     ChevronRightIcon, 
-    MessageSquareIcon 
+    MessageSquareIcon,
+    Download
 } from 'lucide-react';
 
 interface NavigationProps {
@@ -13,6 +14,8 @@ interface NavigationProps {
     onNext: () => void;
     showSpeakerNotes: boolean;
     onToggleSpeakerNotes: () => void;
+    showExportPanel?: boolean;
+    onToggleExportPanel?: () => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({
@@ -21,7 +24,9 @@ export const Navigation: React.FC<NavigationProps> = ({
     onPrevious,
     onNext,
     showSpeakerNotes,
-    onToggleSpeakerNotes
+    onToggleSpeakerNotes,
+    showExportPanel = false,
+    onToggleExportPanel
 }) => {
     // Ensure 1-based slide numbering for display
     const displayCurrentSlide = currentSlide + 1;
@@ -88,12 +93,32 @@ export const Navigation: React.FC<NavigationProps> = ({
                 />
             </Button>
 
+            {/* Export Panel Toggle */}
+            {onToggleExportPanel && (
+                <Button 
+                    variant={showExportPanel ? 'default' : 'outline'}
+                    size="icon"
+                    onClick={onToggleExportPanel}
+                    className="group transition-colors"
+                    aria-pressed={showExportPanel}
+                    aria-label={showExportPanel ? 'Hide Export Panel' : 'Show Export Panel'}
+                >
+                    <Download 
+                        className={`h-5 w-5 ${
+                            showExportPanel 
+                            ? 'text-background' 
+                            : 'text-primary group-hover:text-primary/80'
+                        }`} 
+                    />
+                </Button>
+            )}
+
             {/* Keyboard Shortcut Hints */}
             <div 
                 className="absolute bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-muted/60 hidden md:block"
                 aria-hidden="true"
             >
-                Tip: Use ← → keys to navigate
+                Tip: Use ← → to navigate, S for notes, E for export
             </div>
         </nav>
     );

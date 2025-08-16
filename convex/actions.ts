@@ -111,6 +111,16 @@ export const generateSlides = action({
   },
 })
 
+// Simple HTML escaping function to prevent XSS
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 export const exportDeckHTML = action({
   args: { deckId: v.id('decks') },
   handler: async (ctx, args): Promise<{ success: boolean; html: string }> => {
@@ -124,7 +134,7 @@ export const exportDeckHTML = action({
         throw new Error('Deck not found')
       }
 
-      // Generate HTML export
+      // Generate reveal.js HTML export with luxury SaaS theme
       const html: string = `
 <!DOCTYPE html>
 <html lang="en">
@@ -132,33 +142,142 @@ export const exportDeckHTML = action({
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${deckWithSlides.title}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; margin: 0; padding: 20px; background: #f8fafc; }
-        .deck { max-width: 800px; margin: 0 auto; }
-        .slide { background: white; margin: 20px 0; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .slide-title { font-size: 2rem; font-weight: 600; margin-bottom: 20px; color: #1e293b; }
-        .slide-content { font-size: 1.1rem; line-height: 1.6; color: #475569; }
-        .speaker-notes { margin-top: 20px; padding: 15px; background: #f1f5f9; border-left: 4px solid #6366f1; }
-        .speaker-notes-title { font-weight: 600; color: #1e293b; margin-bottom: 10px; }
-        .deck-title { text-align: center; font-size: 2.5rem; margin-bottom: 40px; color: #1e293b; }
+        :root {
+            --primary: hsl(259, 94%, 51%);
+            --secondary: hsl(48, 100%, 67%);
+            --accent: hsl(200, 98%, 39%);
+            --success: hsl(142, 69%, 58%);
+            --background: hsl(260, 60%, 99%);
+            --muted: hsl(259, 15%, 60%);
+        }
+        
+        .reveal {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, hsl(259, 30%, 97%) 100%);
+        }
+        
+        .reveal .slides section {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 2rem;
+            box-shadow: 0 20px 60px rgba(103, 58, 183, 0.1), 0 8px 24px rgba(103, 58, 183, 0.05);
+            backdrop-filter: blur(10px);
+        }
+        
+        .reveal h1, .reveal h2, .reveal h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .reveal h1 {
+            font-size: 3.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .reveal h2 {
+            font-size: 2.5rem;
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 0.5rem;
+        }
+        
+        .reveal p, .reveal li {
+            font-size: 1.25rem;
+            line-height: 1.7;
+            color: hsl(260, 15%, 25%);
+            margin-bottom: 1rem;
+        }
+        
+        .reveal .speaker-notes {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--secondary) 0%, hsl(48, 80%, 75%) 100%);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .reveal .speaker-notes-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .reveal .controls {
+            color: var(--primary);
+        }
+        
+        .reveal .progress {
+            background: rgba(103, 58, 183, 0.2);
+        }
+        
+        .reveal .progress span {
+            background: var(--primary);
+        }
+        
+        .reveal .slide-number {
+            color: var(--primary);
+            font-family: 'Space Grotesk', sans-serif;
+        }
     </style>
 </head>
 <body>
-    <div class="deck">
-        <h1 class="deck-title">${deckWithSlides.title}</h1>
-        ${deckWithSlides.slides.map((slide: any) => `
-            <div class="slide">
-                <h2 class="slide-title">${slide.title}</h2>
-                <div class="slide-content">${slide.content}</div>
-                ${slide.speakerNotes ? `
-                    <div class="speaker-notes">
-                        <div class="speaker-notes-title">Speaker Notes:</div>
-                        <div>${slide.speakerNotes}</div>
-                    </div>
-                ` : ''}
-            </div>
-        `).join('')}
+    <div class="reveal">
+        <div class="slides">
+            <section data-background-gradient="linear-gradient(135deg, hsl(260, 60%, 99%) 0%, hsl(259, 30%, 97%) 100%)">
+                <h1>${escapeHtml(deckWithSlides.title)}</h1>
+                <p style="text-align: center; font-size: 1.5rem; color: var(--muted); font-style: italic;">
+                    Generated from Voice to Slide
+                </p>
+            </section>
+            
+            ${deckWithSlides.slides.map((slide: any) => `
+                <section data-background-gradient="linear-gradient(135deg, hsl(260, 60%, 99%) 0%, hsl(259, 30%, 97%) 100%)">
+                    <h2>${escapeHtml(slide.title)}</h2>
+                    <div style="font-size: 1.25rem; line-height: 1.7;">${escapeHtml(slide.content)}</div>
+                    ${slide.speakerNotes ? `
+                        <div class="speaker-notes">
+                            <div class="speaker-notes-title">💡 Speaker Notes</div>
+                            <div>${escapeHtml(slide.speakerNotes)}</div>
+                        </div>
+                    ` : ''}
+                </section>
+            `).join('')}
+            
+            <section data-background-gradient="linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)">
+                <h2 style="color: white; text-align: center;">Thank You</h2>
+                <p style="text-align: center; color: rgba(255,255,255,0.9); font-size: 1.5rem;">
+                    Questions & Discussion
+                </p>
+            </section>
+        </div>
     </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            controls: true,
+            progress: true,
+            center: true,
+            transition: 'slide',
+            transitionSpeed: 'default',
+            backgroundTransition: 'fade'
+        });
+    </script>
 </body>
 </html>`
 
@@ -171,7 +290,7 @@ export const exportDeckHTML = action({
 
 export const exportDeckPDF = action({
   args: { deckId: v.id('decks') },
-  handler: async (ctx, args): Promise<{ success: boolean; pdfData: any }> => {
+  handler: async (ctx, args): Promise<{ success: boolean; pdfBuffer: string }> => {
     try {
       // Get deck with slides
       const deckWithSlides: any = await ctx.runQuery(api.decks.getDeckWithSlides, {
@@ -182,15 +301,22 @@ export const exportDeckPDF = action({
         throw new Error('Deck not found')
       }
 
-      // TODO: Integrate with PDF generation service (e.g., Puppeteer, jsPDF)
-      // For now, we'll return a placeholder response
-      const pdfData: any = {
-        title: deckWithSlides.title,
-        slideCount: deckWithSlides.slides.length,
-        message: 'PDF generation would be implemented here with a service like Puppeteer or jsPDF',
+      // First get the HTML version for PDF conversion
+      const htmlResult = await ctx.runAction(api.actions.exportDeckHTML, {
+        deckId: args.deckId,
+      })
+
+      if (!htmlResult.success) {
+        throw new Error('Failed to generate HTML for PDF conversion')
       }
 
-      return { success: true, pdfData }
+      // For PDF generation, we'll return the HTML to be processed by the API route
+      // The actual PDF generation will happen in the Next.js API route using Puppeteer
+      // This approach allows us to use server-side resources more efficiently
+      return { 
+        success: true, 
+        pdfBuffer: Buffer.from(htmlResult.html).toString('base64')
+      }
     } catch (error: any) {
       throw new Error(`PDF export failed: ${error?.message || 'Unknown error'}`)
     }

@@ -8,6 +8,7 @@ import { Card } from './ui/card';
 import SlideCard from './SlideCard';
 import { Navigation } from './Navigation';
 import { Skeleton } from './ui/skeleton';
+import { ExportPanel } from './ExportPanel';
 
 interface SlideViewerProps {
   deckId: Id<'decks'>;
@@ -21,6 +22,7 @@ export const SlideViewer: React.FC<SlideViewerProps> = ({
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(initialSlide);
   const [showSpeakerNotes, setShowSpeakerNotes] = useState(false);
+  const [showExportPanel, setShowExportPanel] = useState(false);
   const viewerRef = useRef<HTMLDivElement>(null);
 
   // Fetch deck with slides from Convex
@@ -70,6 +72,11 @@ export const SlideViewer: React.FC<SlideViewerProps> = ({
       case 'S':
         event.preventDefault();
         setShowSpeakerNotes(prev => !prev);
+        break;
+      case 'e':
+      case 'E':
+        event.preventDefault();
+        setShowExportPanel(prev => !prev);
         break;
     }
   }, [deck?.slides?.length, router, goToNextSlide, goToPreviousSlide]);
@@ -144,7 +151,19 @@ export const SlideViewer: React.FC<SlideViewerProps> = ({
         onNext={goToNextSlide}
         showSpeakerNotes={showSpeakerNotes}
         onToggleSpeakerNotes={() => setShowSpeakerNotes(!showSpeakerNotes)}
+        showExportPanel={showExportPanel}
+        onToggleExportPanel={() => setShowExportPanel(!showExportPanel)}
       />
+
+      {/* Export Panel */}
+      {showExportPanel && (
+        <ExportPanel
+          deckId={deckId}
+          onExport={(type, success) => {
+            console.log(`${type} export ${success ? 'successful' : 'failed'}`)
+          }}
+        />
+      )}
     </div>
   );
 };

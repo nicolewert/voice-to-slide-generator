@@ -273,6 +273,77 @@ Demonstrates:
 - Accessibility and keyboard navigation
 - Rapid prototyping capabilities
 
+## Export System
+
+### Feature Overview
+Premium export functionality allowing users to download presentations in multiple formats with professional styling and security measures.
+
+### Core Components
+- **ExportPanel**: Intuitive export interface with progress tracking
+- **HTML Export**: Reveal.js-powered presentations with luxury theme
+- **PDF Generation**: Browser-automated PDF creation with Playwright
+- **Security**: HTML sanitization and XSS prevention
+
+### Key Features
+- **Dual Format Support**: HTML (interactive) and PDF (print-ready)
+- **Keyboard Integration**: Press `E` in slide viewer to toggle export panel
+- **Real-time Progress**: Loading states and error handling for demo reliability
+- **Luxury Styling**: 
+  - Premium reveal.js themes with gold and purple accents
+  - Sophisticated typography (Playfair Display, Inter, Space Grotesk)
+  - Elegant animations and transitions
+- **Security Hardening**: HTML content sanitization prevents XSS attacks
+- **Resource Management**: Robust browser cleanup prevents memory leaks
+
+### API Endpoints
+```typescript
+// HTML Export
+GET /api/decks/[id]/export/html
+// Returns: Downloadable HTML file with reveal.js presentation
+
+// PDF Export  
+GET /api/decks/[id]/export/pdf
+// Returns: Downloadable PDF with optimized presentation layout
+```
+
+### Convex Actions
+```typescript
+// Generate HTML presentation
+const html = await exportDeckHTML({ deckId });
+
+// Generate PDF-ready HTML
+const pdf = await exportDeckPDF({ deckId });
+```
+
+### Usage in Components
+```typescript
+import { ExportPanel } from '@/components/ExportPanel'
+
+<ExportPanel 
+  deckId={deckId} 
+  onExport={(type, success) => console.log(`${type} export ${success ? 'succeeded' : 'failed'}`)}
+/>
+```
+
+### Demo Integration
+- **Keyboard Shortcut**: `E` key toggles export panel in slide viewer
+- **Error Handling**: User-friendly error messages for demo reliability
+- **Progress Tracking**: Visual feedback during PDF generation (can take 10-30 seconds)
+- **File Naming**: Automatic sanitization of deck titles for safe filenames
+
+### Technical Implementation
+- **PDF Generation**: Uses Playwright with Chromium for high-fidelity rendering
+- **HTML Templating**: Server-side generation with luxury SaaS theme
+- **Error Recovery**: Comprehensive try/catch with resource cleanup
+- **Performance**: Optimized viewport settings for fast PDF generation
+
+### Hackathon Impact
+Demonstrates:
+- Advanced browser automation integration
+- Security-first development practices
+- Premium user experience design
+- Real-world export functionality
+
 ## License
 
 MIT License - feel free to use this template for your hackathon projects!
