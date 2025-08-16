@@ -161,16 +161,19 @@ export const SlideViewer: React.FC<SlideViewerProps> = ({
           slideCount={deck?.slides?.length || 0}
           onExport={(type, success) => {
             console.log(`${type} export ${success ? 'successful' : 'failed'}`);
-            success && toast.success(`${type.toUpperCase()} Export Completed`, {
-              description: 'Your presentation is ready for sharing!',
-              duration: 3000,
-              position: 'top-right'
-            });
-            !success && toast.error('Export Failed', {
-              description: 'Please try again or contact support.',
-              duration: 3000,
-              position: 'top-right'
-            });
+            if (success) {
+              toast.success(`${type.toUpperCase()} Export Completed`, {
+                description: 'Your presentation is ready for sharing!',
+                duration: 3000,
+                position: 'top-right'
+              });
+            } else {
+              toast.error('Export Failed', {
+                description: 'Please try again or contact support.',
+                duration: 3000,
+                position: 'top-right'
+              });
+            }
           }}
         />
       )}

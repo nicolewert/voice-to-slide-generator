@@ -1,8 +1,6 @@
 import React from 'react';
 import { 
   FileAudio, 
-  ArrowRight, 
-  SlidersHorizontal, 
   Check, 
   Waves, 
   ScrollText 

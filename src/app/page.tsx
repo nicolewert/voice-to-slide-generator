@@ -2,23 +2,15 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { VoiceToSlideUploader } from "@/components/VoiceToSlideUploader"
 import { VoiceToSlideProcessor } from "@/components/VoiceToSlideProcessor"
 import { Badge } from "@/components/ui/badge"
-import { Mic } from "lucide-react"
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 export default function Home() {
-  const router = useRouter()
   const recentDecks = useQuery(api.decks.getRecentDecks, { limit: 3 })
 
-  const handleDeckCreated = (deckId: string) => {
-    console.log('Deck created:', deckId)
-    router.push(`/deck/${deckId}`)
-  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <div className="container mx-auto px-4 py-8">

@@ -31,10 +31,8 @@ interface ToastProps extends ToastType {
 }
 
 export const Toast: React.FC<ToastProps> = ({ 
-  id, 
   message, 
   type = 'info', 
-  duration = 5000, 
   onClose 
 }) => {
   const Icon = ICONS[type];

@@ -33,6 +33,7 @@ const ToastRoot = React.forwardRef<
     {...props}
   />
 ))
+ToastRoot.displayName = "ToastRoot"
 
 const ToastAction = ToastPrimitives.Action
 const ToastClose = ToastPrimitives.Close
@@ -47,6 +48,7 @@ const ToastTitle = React.forwardRef<
     {...props}
   />
 ))
+ToastTitle.displayName = "ToastTitle"
 
 const ToastDescription = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Description>,
@@ -58,6 +60,7 @@ const ToastDescription = React.forwardRef<
     {...props}
   />
 ))
+ToastDescription.displayName = "ToastDescription"
 
 // Simplified Toast API
 const toast = {

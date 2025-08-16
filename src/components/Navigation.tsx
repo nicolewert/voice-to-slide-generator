@@ -15,8 +15,7 @@ import {
     DialogTrigger
 } from '@/components/ui/dialog';
 
-const NAV_ITEMS = [
-];
+const NAV_ITEMS: Array<{href: string; label: string}> = [];
 
 export const Navigation: React.FC = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

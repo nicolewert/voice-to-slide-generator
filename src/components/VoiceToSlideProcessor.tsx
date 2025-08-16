@@ -57,7 +57,7 @@ export function VoiceToSlideProcessor() {
         // Keep current step but let ProcessingStatus show the error
         break
     }
-  }, [deck])
+  }, [deck, showInfo, showSuccess])
 
   const handleDeckCreated = (deckId: string) => {
     console.log('Deck created in processor:', deckId)

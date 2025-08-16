@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { 
   ChevronLeft, 
   ChevronRight, 
-  SpeakerIcon,
-  Fullscreen
+  SpeakerIcon
 } from 'lucide-react';
 
 interface SlideNavigationProps {

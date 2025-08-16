@@ -167,8 +167,8 @@ export function isArrowKey(key: string): boolean {
     KeyboardCodes.ARROW_DOWN,
     KeyboardCodes.ARROW_LEFT,
     KeyboardCodes.ARROW_RIGHT,
-  ]
-  return arrowKeys.includes(key as string)
+  ] as const
+  return (arrowKeys as readonly string[]).includes(key)
 }
 
 // ARIA attributes helpers
