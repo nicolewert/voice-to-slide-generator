@@ -6,7 +6,6 @@ import {
   ChevronLeft, 
   ChevronRight, 
   SpeakerIcon,
-  FileDown,
   Fullscreen
 } from 'lucide-react';
 
@@ -17,8 +16,6 @@ interface SlideNavigationProps {
   onNext: () => void;
   showSpeakerNotes: boolean;
   onToggleSpeakerNotes: () => void;
-  showExportPanel: boolean;
-  onToggleExportPanel: () => void;
 }
 
 export const SlideNavigation: React.FC<SlideNavigationProps> = ({ 
@@ -27,9 +24,7 @@ export const SlideNavigation: React.FC<SlideNavigationProps> = ({
   onPrevious,
   onNext,
   showSpeakerNotes,
-  onToggleSpeakerNotes,
-  showExportPanel,
-  onToggleExportPanel
+  onToggleSpeakerNotes
 }) => {
   return (
     <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
@@ -78,16 +73,6 @@ export const SlideNavigation: React.FC<SlideNavigationProps> = ({
           className={`hover:bg-primary/10 ${showSpeakerNotes ? 'bg-primary/10 text-primary' : ''}`}
         >
           <SpeakerIcon className="w-5 h-5" />
-        </Button>
-
-        {/* Export Panel Toggle */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onToggleExportPanel}
-          className={`hover:bg-primary/10 ${showExportPanel ? 'bg-primary/10 text-primary' : ''}`}
-        >
-          <FileDown className="w-5 h-5" />
         </Button>
       </div>
     </div>

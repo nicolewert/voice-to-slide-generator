@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, use } from 'react';
 import { SlideViewer } from '@/components/SlideViewer';
 import { ExportPanel } from '@/components/ExportPanel';
 import { ErrorDisplay } from '@/components/ErrorDisplay';
@@ -68,8 +68,8 @@ function DeckContent({ id }: { id: string }) {
   );
 }
 
-export default async function DeckPage({ params }: DeckPageProps) {
-  const { id } = await params;
+export default function DeckPage({ params }: DeckPageProps) {
+  const { id } = use(params);
   
   return (
     <Suspense fallback={<LoadingSpinner />}>

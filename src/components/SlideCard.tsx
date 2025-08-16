@@ -46,7 +46,7 @@ const SlideCard: React.FC<SlideCardProps> = ({
   return (
     <Card 
       className={cn(
-        "transition-all duration-300 ease-in-out transform hover:scale-[1.02]",
+        "min-h-[400px] transition-all duration-300 ease-in-out transform hover:scale-[1.02]",
         "bg-background border-2 rounded-xl shadow-xl",
         isActive 
           ? "border-[hsl(48,100%,67%)] ring-4 ring-opacity-50 ring-[hsl(48,100%,67%)]" 
@@ -64,17 +64,17 @@ const SlideCard: React.FC<SlideCardProps> = ({
         </CardTitle>
       </CardHeader>
       
-      <CardContent className="prose max-w-none">
+      <CardContent className="prose max-w-none flex-1 flex flex-col justify-start py-6">
         <ReactMarkdown 
           components={{
             h1: ({ ...props }) => (
-              <h1 className="text-2xl font-bold text-primary" {...props} />
+              <h1 className="text-2xl font-bold text-primary mb-4" {...props} />
             ),
             h2: ({ ...props }) => (
-              <h2 className="text-xl font-semibold text-accent" {...props} />
+              <h2 className="text-xl font-semibold text-accent mb-3" {...props} />
             ),
             p: ({ ...props }) => (
-              <p className="text-base leading-relaxed" {...props} />
+              <p className="text-base leading-relaxed mb-3" {...props} />
             ),
           }}
         >

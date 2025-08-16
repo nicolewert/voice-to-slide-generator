@@ -37,17 +37,21 @@ function DeckContent({ id }: { id: string }) {
   return (
     <div className="min-h-screen bg-background text-primary-foreground">
       <div className="container mx-auto px-4 py-8">
-        <Card className="p-6 mb-6 bg-white/80 shadow-lg border-none">
-          <h1 className="text-3xl md:text-4xl font-playfair font-bold text-primary mb-4 truncate">
-            {deck.title}
-          </h1>
-          
-          <div className="flex justify-between items-center">
-            <span className="text-muted-foreground text-sm">
-              {deck.slides.length} slides
-            </span>
+        <Card className="p-8 mb-8 bg-gradient-to-r from-white/90 to-white/80 shadow-luxury border border-primary/10 rounded-2xl backdrop-blur-sm">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="text-4xl md:text-5xl font-playfair font-bold text-gradient-luxury mb-3">
+                {deck.title}
+              </h1>
+              <div className="flex items-center gap-4 text-muted-foreground">
+                <span className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  {deck.slides.length} slides
+                </span>
+              </div>
+            </div>
             
-            <div className="flex space-x-2">
+            <div className="flex items-center space-x-3">
               <ExportPanel 
                 deckId={id as Id<'decks'>}
                 slideCount={deck.slides.length}

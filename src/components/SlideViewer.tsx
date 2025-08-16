@@ -31,7 +31,7 @@ export const SlideViewer: React.FC<SlideViewerProps> = ({
 
   // Update URL with current slide index
   const updateUrlState = useCallback((slideIndex: number) => {
-    router.replace(`/decks/${deckId}?slide=${slideIndex}`);
+    router.replace(`/deck/${deckId}?slide=${slideIndex}`);
   }, [router, deckId]);
 
   // Slide navigation functions
@@ -152,8 +152,6 @@ export const SlideViewer: React.FC<SlideViewerProps> = ({
         onNext={goToNextSlide}
         showSpeakerNotes={showSpeakerNotes}
         onToggleSpeakerNotes={() => setShowSpeakerNotes(!showSpeakerNotes)}
-        showExportPanel={showExportPanel}
-        onToggleExportPanel={() => setShowExportPanel(!showExportPanel)}
       />
 
       {/* Export Panel */}
