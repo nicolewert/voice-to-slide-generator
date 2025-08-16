@@ -23,4 +23,27 @@ export default defineSchema({
     updatedAt: v.number(),
   }).index('by_user', ['userId'])
     .index('by_created_at', ['createdAt']),
+
+  decks: defineTable({
+    title: v.string(),
+    audioUrl: v.optional(v.string()),
+    audioFileId: v.optional(v.id('_storage')),
+    transcript: v.optional(v.string()),
+    status: v.union(v.literal('processing'), v.literal('completed'), v.literal('error')),
+    errorMessage: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    totalSlides: v.number(),
+  }).index('by_created_at', ['createdAt'])
+    .index('by_status', ['status']),
+
+  slides: defineTable({
+    deckId: v.id('decks'),
+    title: v.string(),
+    content: v.string(),
+    speakerNotes: v.optional(v.string()),
+    order: v.number(),
+    createdAt: v.number(),
+  }).index('by_deck', ['deckId'])
+    .index('by_deck_order', ['deckId', 'order']),
 })
