@@ -15,6 +15,7 @@ import type {
 } from "convex/server";
 import type * as actions from "../actions.js";
 import type * as decks from "../decks.js";
+import type * as files from "../files.js";
 import type * as notes from "../notes.js";
 import type * as slides from "../slides.js";
 import type * as tasks from "../tasks.js";
@@ -31,6 +32,7 @@ import type * as users from "../users.js";
 declare const fullApi: ApiFromModules<{
   actions: typeof actions;
   decks: typeof decks;
+  files: typeof files;
   notes: typeof notes;
   slides: typeof slides;
   tasks: typeof tasks;

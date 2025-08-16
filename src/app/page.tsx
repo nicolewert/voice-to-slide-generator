@@ -1,7 +1,10 @@
+'use client'
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { TaskList } from "@/components/TaskList"
+import { VoiceToSlideUploader } from "@/components/VoiceToSlideUploader"
 
 export default function Home() {
   return (
@@ -75,6 +78,13 @@ export default function Home() {
         <div className="mb-16">
           <h2 className="text-2xl font-semibold text-center mb-8">Try the Convex Integration</h2>
           <TaskList />
+        </div>
+
+        <div className="mb-16">
+          <h2 className="text-2xl font-semibold text-center mb-8">Voice-to-Slide Generator</h2>
+          <div className="max-w-2xl mx-auto">
+            <VoiceToSlideUploader onDeckCreated={(deckId) => console.log('Deck created:', deckId)} />
+          </div>
         </div>
 
         <div className="text-center space-y-4">
