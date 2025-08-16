@@ -5,6 +5,7 @@ import { api } from '../../convex/_generated/api';
 import { useRouter } from 'next/navigation';
 
 import { Card } from './ui/card';
+import { toast } from './ui/toast';
 import SlideCard from './SlideCard';
 import { SlideNavigation } from './SlideNavigation';
 import { Skeleton } from './ui/skeleton';
@@ -133,7 +134,7 @@ export const SlideViewer: React.FC<SlideViewerProps> = ({
     <div 
       ref={viewerRef} 
       tabIndex={0} 
-      className="w-full max-w-4xl mx-auto p-4 space-y-4 focus:outline-none"
+      className="w-full max-w-4xl mx-auto p-4 space-y-4 focus:outline-none bg-background/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-primary/10 transition-all duration-500 ease-in-out hover:shadow-[0_0_30px_rgba(48,207,208,0.2)]"
       aria-label="Slide Viewer"
     >
       {/* Slide Display */}
@@ -159,8 +160,19 @@ export const SlideViewer: React.FC<SlideViewerProps> = ({
       {showExportPanel && (
         <ExportPanel
           deckId={deckId}
+          slideCount={deck?.slides?.length || 0}
           onExport={(type, success) => {
-            console.log(`${type} export ${success ? 'successful' : 'failed'}`)
+            console.log(`${type} export ${success ? 'successful' : 'failed'}`);
+            success && toast.success(`${type.toUpperCase()} Export Completed`, {
+              description: 'Your presentation is ready for sharing!',
+              duration: 3000,
+              position: 'top-right'
+            });
+            !success && toast.error('Export Failed', {
+              description: 'Please try again or contact support.',
+              duration: 3000,
+              position: 'top-right'
+            });
           }}
         />
       )}

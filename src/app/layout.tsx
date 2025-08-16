@@ -3,7 +3,6 @@ import { Geist, Geist_Mono, Playfair_Display, Inter, Space_Grotesk } from "next/
 import "./globals.css";
 import { ConvexClientProvider } from "@/providers/ConvexClientProvider";
 import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
 import { ToastProvider } from "@/components/Toast/ToastContext";
 import { ToastContainer } from "@/components/Toast/ToastContainer";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -61,7 +60,6 @@ export default function RootLayout({
                 <main id="main-content" className="flex-1 pt-20" tabIndex={-1}>
                   {children}
                 </main>
-                <Footer />
                 <ToastContainer />
               </div>
             </ToastProvider>

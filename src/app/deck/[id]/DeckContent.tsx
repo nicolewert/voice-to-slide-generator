@@ -49,7 +49,8 @@ function DeckContent({ id }: { id: string }) {
             
             <div className="flex space-x-2">
               <ExportPanel 
-                deckId={id as Id<'decks'>} 
+                deckId={id as Id<'decks'>}
+                slideCount={deck.slides.length}
                 className="ml-auto"
               />
             </div>

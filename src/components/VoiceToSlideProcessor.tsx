@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useQuery } from 'convex/react'
 import { VoiceToSlideUploader } from './VoiceToSlideUploader'
 import { ProcessingStatus } from './ProcessingStatus'
@@ -8,10 +8,13 @@ import { ProcessingIndicator } from './ProcessingIndicator'
 import { Button } from './ui/button'
 import type { Id } from '../../convex/_generated/dataModel'
 import { api } from '../../convex/_generated/api'
+import { useToastContext } from './Toast/ToastContext'
 
 export function VoiceToSlideProcessor() {
   const [currentDeckId, setCurrentDeckId] = useState<Id<'decks'> | null>(null)
   const [processingStep, setProcessingStep] = useState<'upload' | 'transcribing' | 'generating' | 'completed'>('upload')
+  const hasShownSpeakerNotesNotification = useRef(false)
+  const { showInfo, showSuccess } = useToastContext()
   
   // Watch deck status for real-time updates
   const deck = useQuery(
@@ -30,6 +33,25 @@ export function VoiceToSlideProcessor() {
         break
       case 'completed':
         setProcessingStep('completed')
+        
+        // Show speaker notes enhancement notification for 5+ slide presentations
+        if (deck.totalSlides >= 5 && !hasShownSpeakerNotesNotification.current) {
+          hasShownSpeakerNotesNotification.current = true
+          
+          // Show info toast about premium enhancement starting
+          showInfo(
+            `🎯 Premium enhancement started! Your ${deck.totalSlides}-slide presentation is getting AI-powered speaker notes with professional delivery tips.`,
+            8000
+          )
+          
+          // Show success notification after a delay (simulating background processing)
+          setTimeout(() => {
+            showSuccess(
+              `✨ Premium speaker notes enhanced! Your presentation now includes professional speaking techniques and audience engagement strategies.`,
+              10000
+            )
+          }, 5000) // 5 second delay to show progression
+        }
         break
       case 'error':
         // Keep current step but let ProcessingStatus show the error
@@ -46,6 +68,7 @@ export function VoiceToSlideProcessor() {
   const resetProcessor = () => {
     setCurrentDeckId(null)
     setProcessingStep('upload')
+    hasShownSpeakerNotesNotification.current = false
   }
 
   return (

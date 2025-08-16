@@ -18,7 +18,9 @@ import type * as ai from "../ai.js";
 import type * as decks from "../decks.js";
 import type * as files from "../files.js";
 import type * as notes from "../notes.js";
+import type * as sampleData from "../sampleData.js";
 import type * as slides from "../slides.js";
+import type * as speakerNotesGenerator from "../speakerNotesGenerator.js";
 import type * as tasks from "../tasks.js";
 import type * as users from "../users.js";
 
@@ -36,7 +38,9 @@ declare const fullApi: ApiFromModules<{
   decks: typeof decks;
   files: typeof files;
   notes: typeof notes;
+  sampleData: typeof sampleData;
   slides: typeof slides;
+  speakerNotesGenerator: typeof speakerNotesGenerator;
   tasks: typeof tasks;
   users: typeof users;
 }>;

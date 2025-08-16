@@ -30,47 +30,32 @@ export function Footer() {
             Transform your voice into powerful presentations with AI-driven precision.
           </p>
           <p className="text-xs text-muted-foreground">
-            © {currentYear} Slide AI Technologies. All rights reserved.
+            © {currentYear} Voice to Slide Generator. All rights reserved.
           </p>
         </div>
 
-        {/* Quick Links */}
+        {/* Navigation */}
         <div className="space-y-4">
           <h4 className="text-lg font-semibold font-playfair text-primary">
-            Quick Links
+            Navigation
           </h4>
           <nav className="space-y-2">
-            <Link href="/privacy" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-              Privacy Policy
+            <Link href="/" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+              Home
             </Link>
-            <Link href="/terms" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-              Terms of Service
-            </Link>
-            <Link href="/support" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-              Support
+            <Link href="/demo" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+              Demo
             </Link>
           </nav>
         </div>
 
-        {/* Social and Contact */}
+        {/* About */}
         <div className="space-y-4">
           <h4 className="text-lg font-semibold font-playfair text-primary">
-            Connect With Us
+            About
           </h4>
-          <div className="flex space-x-4">
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="https://twitter.com" target="_blank" aria-label="Twitter">
-                <TwitterIcon />
-              </Link>
-            </Button>
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="https://linkedin.com" target="_blank" aria-label="LinkedIn">
-                <LinkedInIcon />
-              </Link>
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Stay updated with the latest AI presentation technologies.
+          <p className="text-sm text-muted-foreground">
+            A voice-to-slide presentation generator built for creating professional presentations from audio recordings.
           </p>
         </div>
       </div>

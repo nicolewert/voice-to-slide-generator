@@ -27,9 +27,9 @@ export async function GET(
       return NextResponse.json({ error: 'Deck not found' }, { status: 404 })
     }
 
-    if (!deck.slides || deck.slides.length < 5) {
+    if (!deck.slides || deck.slides.length < 3) {
       return NextResponse.json({ 
-        error: 'Export requires at least 5 slides. This deck has ' + (deck.slides?.length || 0) + ' slides.' 
+        error: 'Export requires at least 3 slides. This deck has ' + (deck.slides?.length || 0) + ' slides.' 
       }, { status: 400 })
     }
 

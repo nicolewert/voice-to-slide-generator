@@ -3,8 +3,9 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { VoiceToSlideUploader } from "@/components/VoiceToSlideUploader"
+import { VoiceToSlideProcessor } from "@/components/VoiceToSlideProcessor"
 import { Badge } from "@/components/ui/badge"
-import { Play, Mic, FileText, MonitorSmartphone } from "lucide-react"
+import { Mic } from "lucide-react"
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import Link from 'next/link'
@@ -19,167 +20,87 @@ export default function Home() {
     router.push(`/deck/${deckId}`)
   }
   return (
-    <div className="min-h-screen bg-background font-inter text-foreground">
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 lg:py-24 text-center">
-        <div className="max-w-4xl mx-auto space-y-6">
-          <Badge variant="secondary" className="mb-4 bg-primary/10 text-primary">
-            AI-Powered Presentation Magic
-          </Badge>
-          <h1 className="text-5xl md:text-6xl font-playfair font-bold tracking-tight text-primary">
-            Transform Voice into Compelling Slides
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center space-y-6 mb-12">
+          <div className="flex justify-center">
+            <Badge variant="secondary" className="mb-4 px-4 py-2">
+              🚀 Hackathon Demo
+            </Badge>
+          </div>
+          <h1 className="text-5xl font-playfair font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Voice-to-Slide Generator
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Instantly create professional, engaging presentations directly from your voice. 
-            Sophisticated AI turns your ideas into polished, luxury-grade slides.
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-inter">
+            Transform your voice recordings into professional presentations with AI-powered transcription and slide generation. Perfect for busy professionals who want to create presentations quickly.
           </p>
-          <div className="flex gap-4 justify-center pt-6">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-background">
-              Create Your First Deck
-            </Button>
-            <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary/10">
-              Watch Demo
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="container mx-auto px-4 py-16 lg:py-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { 
-              icon: Mic, 
-              title: "Voice-Powered Creation", 
-              description: "Speak naturally. Our AI transforms your words into professional slides instantly."
-            },
-            { 
-              icon: Play, 
-              title: "Instant Visualization", 
-              description: "Advanced AI generates contextually relevant visuals and layouts." 
-            },
-            { 
-              icon: FileText, 
-              title: "Professional Styling", 
-              description: "Luxury-grade design with sophisticated typography and color schemes."
-            },
-            { 
-              icon: MonitorSmartphone, 
-              title: "Multi-Platform Ready", 
-              description: "Seamless presentations across devices, from boardrooms to mobile."
-            }
-          ].map(({ icon: Icon, title, description }, index) => (
-            <Card key={index} className="bg-background border-primary/10 hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Icon className="w-6 h-6 text-primary" />
-                </div>
-                <CardTitle className="font-playfair text-xl text-primary">{title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-muted-foreground">
-                  {description}
-                </CardDescription>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* Voice-to-Slide Generator Section */}
-      <section className="container mx-auto px-4 py-16 lg:py-24 bg-background/50">
-        <div className="max-w-3xl mx-auto text-center mb-12">
-          <h2 className="text-4xl font-playfair font-bold mb-4 text-primary">
-            Create Your Deck in Seconds
-          </h2>
-          <p className="text-xl text-muted-foreground">
-            Speak your ideas. Watch them transform into a polished presentation.
-          </p>
-        </div>
-        <div className="max-w-2xl mx-auto">
-          <VoiceToSlideUploader 
-            onDeckCreated={handleDeckCreated} 
-            className="shadow-lg rounded-2xl border border-primary/10"
-          />
-        </div>
-      </section>
-
-      {/* Testimonials / Social Proof (Placeholder) */}
-      <section className="container mx-auto px-4 py-16 lg:py-24 bg-background/50">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-playfair font-bold mb-8 text-primary">
-            Trusted by Professionals Worldwide
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { name: "Sarah Johnson", role: "Marketing Director", quote: "Revolutionized how we create presentations!" },
-              { name: "Michael Chen", role: "Tech Startup Founder", quote: "Incredible AI-powered slide generation." },
-              { name: "Elena Rodriguez", role: "Global Consultant", quote: "Saves hours of preparation time." }
-            ].map(({ name, role, quote }, index) => (
-              <Card key={index} className="bg-background border-primary/10 hover:shadow-md transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <p className="italic text-muted-foreground mb-4">&ldquo;{quote}&rdquo;</p>
-                  <div>
-                    <p className="font-semibold text-primary">{name}</p>
-                    <p className="text-sm text-muted-foreground">{role}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Recent Decks */}
-      {recentDecks && recentDecks.length > 0 && (
-        <section className="container mx-auto px-4 py-16 lg:py-24 bg-background">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-4xl font-playfair font-bold mb-8 text-primary text-center">
-              Recent Presentations
-            </h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              {recentDecks.map((deck) => (
-                <Card key={deck._id} className="bg-background border-primary/10 hover:shadow-md transition-shadow cursor-pointer">
-                  <Link href={`/deck/${deck._id}`}>
-                    <CardHeader>
-                      <CardTitle className="font-playfair text-lg text-primary">{deck.title}</CardTitle>
-                      <CardDescription className="text-muted-foreground">
-                        {deck.totalSlides} slide{deck.totalSlides !== 1 ? 's' : ''} • {deck.status}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10">
-                        View Presentation
-                      </Button>
-                    </CardContent>
-                  </Link>
-                </Card>
-              ))}
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl mx-auto">
+            <div className="text-center space-y-3">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-primary">Record Audio</h3>
+              <p className="text-sm text-muted-foreground">Upload your voice recording in MP3, WAV, or M4A format</p>
+            </div>
+            
+            <div className="text-center space-y-3">
+              <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto">
+                <svg className="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-accent">AI Processing</h3>
+              <p className="text-sm text-muted-foreground">Our AI transcribes speech and generates structured content</p>
+            </div>
+            
+            <div className="text-center space-y-3">
+              <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto">
+                <svg className="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-secondary">Get Slides</h3>
+              <p className="text-sm text-muted-foreground">Receive professionally formatted slides ready for presentation</p>
             </div>
           </div>
-        </section>
-      )}
-
-      {/* Call to Action */}
-      <section className="container mx-auto px-4 py-16 lg:py-24 text-center bg-primary/5">
-        <div className="max-w-3xl mx-auto space-y-6">
-          <h2 className="text-4xl font-playfair font-bold text-primary">
-            Ready to Elevate Your Presentations?
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Experience the future of presentation creation. Transform your voice into 
-            professional, engaging slides in moments.
-          </p>
-          <div className="flex gap-4 justify-center pt-6">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-background">
-              Start Creating
-            </Button>
-            <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary/10">
-              Learn More
-            </Button>
-          </div>
         </div>
-      </section>
+
+        {/* Main Demo Component */}
+        <VoiceToSlideProcessor />
+
+        {/* Recent Decks */}
+        {recentDecks && recentDecks.length > 0 && (
+          <section className="py-16">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-4xl font-playfair font-bold mb-8 text-primary text-center">
+                Recent Presentations
+              </h2>
+              <div className="grid md:grid-cols-3 gap-6">
+                {recentDecks.map((deck) => (
+                  <Card key={deck._id} className="bg-background border-primary/10 hover:shadow-md transition-shadow cursor-pointer">
+                    <Link href={`/deck/${deck._id}`}>
+                      <CardHeader>
+                        <CardTitle className="font-playfair text-lg text-primary">{deck.title}</CardTitle>
+                        <CardDescription className="text-muted-foreground">
+                          {deck.totalSlides} slide{deck.totalSlides !== 1 ? 's' : ''} • {deck.status}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10">
+                          View Presentation
+                        </Button>
+                      </CardContent>
+                    </Link>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   )
 }

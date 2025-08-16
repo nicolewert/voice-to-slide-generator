@@ -70,18 +70,8 @@ export const transcribeAudio = action({
         })
 
         // TODO: Integrate with actual transcription service (e.g., OpenAI Whisper, AssemblyAI, Claude)
-        // For now, we'll simulate transcription with enhanced error handling
-        const simulatedTranscript = await simulateTranscription(args.audioUrl)
+        throw new Error('AI transcription service not yet implemented. Please integrate with a real AI service like OpenAI Whisper, AssemblyAI, or Claude API.')
 
-        // Update deck with transcript
-        await ctx.runMutation(api.decks.updateDeck, {
-          id: args.deckId,
-          transcript: simulatedTranscript,
-          status: 'completed',
-        })
-
-        console.log(`Transcription successful for deck ${args.deckId}`)
-        return { success: true, transcript: simulatedTranscript }
       } catch (error: any) {
         console.error(`Transcription failed for deck ${args.deckId}:`, error)
         
@@ -102,20 +92,6 @@ export const transcribeAudio = action({
   },
 })
 
-// Simulated transcription function with potential failures
-async function simulateTranscription(audioUrl: string): Promise<string> {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000))
-  
-  // Simulate occasional failures for testing
-  if (Math.random() < 0.1) {
-    throw new Error('Simulated transcription service failure')
-  }
-
-  return `This is a simulated transcript for the audio file at ${audioUrl}. 
-In a real implementation, this would be the actual transcribed text from the audio file using a service like OpenAI Whisper, AssemblyAI, or Claude's audio processing capabilities.
-The transcript would contain the spoken content that will be used to generate slides with proper punctuation, formatting, and clarity.`
-}
 
 export const generateSlides = action({
   args: { 
@@ -137,31 +113,8 @@ export const generateSlides = action({
         })
 
         // TODO: Integrate with AI service (e.g., OpenAI GPT, Anthropic Claude) for slide generation
-        // For now, we'll simulate slide generation with enhanced error handling
-        const simulatedSlides = await simulateSlideGeneration(args.transcript)
+        throw new Error('AI slide generation service not yet implemented. Please integrate with a real AI service like OpenAI GPT or Anthropic Claude.')
 
-        // Create slides in the database
-        const slideIds: any[] = []
-        for (const slide of simulatedSlides) {
-          const slideId = await ctx.runMutation(api.slides.createSlide, {
-            deckId: args.deckId,
-            title: slide.title,
-            content: slide.content,
-            speakerNotes: slide.speakerNotes,
-            order: slide.order,
-          })
-          slideIds.push(slideId)
-        }
-
-        // Update deck with final slide count and completion status
-        await ctx.runMutation(api.decks.updateDeck, {
-          id: args.deckId,
-          status: 'completed',
-          totalSlides: slideIds.length,
-        })
-
-        console.log(`Slide generation successful for deck ${args.deckId}, created ${slideIds.length} slides`)
-        return { success: true, slideIds }
       } catch (error: any) {
         console.error(`Slide generation failed for deck ${args.deckId}:`, error)
         
@@ -182,54 +135,6 @@ export const generateSlides = action({
   },
 })
 
-// Simulated slide generation with enhanced error handling
-async function simulateSlideGeneration(transcript: string): Promise<Array<{
-  title: string
-  content: string
-  speakerNotes: string
-  order: number
-}>> {
-  // Simulate AI processing delay
-  await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000))
-  
-  // Simulate occasional failures for testing
-  if (Math.random() < 0.05) {
-    throw new Error('Simulated AI service failure')
-  }
-
-  // Generate slides based on transcript length and content
-  const wordCount = transcript.split(' ').length
-  const slideCount = Math.max(3, Math.min(8, Math.ceil(wordCount / 50)))
-
-  const slides = [
-    {
-      title: 'Introduction',
-      content: `<h2>Welcome to the Presentation</h2><p>Today we'll explore the key insights from our discussion.</p>`,
-      speakerNotes: 'Start with a warm welcome and introduce yourself. Set expectations for the presentation.',
-      order: 0,
-    }
-  ]
-
-  // Generate middle slides based on content
-  for (let i = 1; i < slideCount - 1; i++) {
-    slides.push({
-      title: `Key Point ${i}`,
-      content: `<h2>Important Insight #${i}</h2><p>This slide covers significant points from the transcript, elaborating on the main themes discussed.</p><ul><li>Key insight from analysis</li><li>Supporting evidence</li><li>Practical implications</li></ul>`,
-      speakerNotes: `Elaborate on point ${i} with examples from the transcript. Connect this to the overall theme and provide context for the audience.`,
-      order: i,
-    })
-  }
-
-  // Add conclusion slide
-  slides.push({
-    title: 'Conclusion',
-    content: '<h2>Thank You</h2><p>We\'ve covered the essential points from our discussion. Questions and feedback are welcome.</p>',
-    speakerNotes: 'Summarize the key takeaways, provide a clear conclusion, and open for Q&A. Thank the audience for their attention.',
-    order: slideCount - 1,
-  })
-
-  return slides
-}
 
 // Simple HTML escaping function to prevent XSS
 function escapeHtml(unsafe: string): string {

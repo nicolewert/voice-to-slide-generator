@@ -66,49 +66,14 @@ export const transcribeAudio = action({
 
       console.log(`Audio URL retrieved successfully for deck ${deckId}`)
 
-      // Simulate realistic processing time for demo
-      await new Promise(resolve => setTimeout(resolve, 2000))
-
-      // In a real implementation, you would:
-      // 1. Download the audio file
-      // 2. Convert it to a format Claude can process (if needed) 
-      // 3. Send it to Claude API for transcription
+      // TODO: Implement real AI transcription service integration
+      // 1. Download the audio file from storage
+      // 2. Convert audio to appropriate format if needed
+      // 3. Send to AI transcription service (e.g., OpenAI Whisper, AssemblyAI, Claude)
+      // 4. Process and clean the transcript
       
-      // For hackathon demo, we'll simulate the transcription process
-      // This mock data makes the demo more realistic and engaging
-      const mockTranscript = `Welcome to our product presentation. Today, I'd like to share with you our innovative voice-to-slide generator that transforms spoken content into professional presentations.
+      throw new Error('AI transcription service not yet implemented. Please integrate with a real AI service like OpenAI Whisper, AssemblyAI, or Claude API.')
 
-First, let me explain the problem we're solving. Many professionals struggle with creating presentations quickly, especially when they have great ideas but limited time to format them properly.
-
-Our solution uses advanced AI technology to automatically transcribe speech and generate well-structured slides. The process is simple: record your voice, upload the audio, and our system handles the rest.
-
-Key features include automatic transcription, intelligent slide generation, customizable templates, and real-time collaboration. We've designed this to save hours of presentation preparation time.
-
-The market opportunity is significant, with millions of professionals creating presentations daily. Our target audience includes business executives, educators, consultants, and anyone who regularly presents ideas.
-
-Thank you for your attention. I'm excited to answer any questions you might have about our voice-to-slide generator.`
-
-      console.log(`Transcription completed for deck ${deckId}`)
-
-      // Update deck with transcript
-      await ctx.runMutation(api.files.updateDeck, {
-        deckId,
-        transcript: mockTranscript,
-      })
-
-      // Start slide generation with timeout protection
-      await Promise.race([
-        ctx.runAction(api.ai.generateSlides, {
-          deckId,
-          transcript: mockTranscript,
-        }),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Slide generation timeout - please try again')), 30000)
-        )
-      ]);
-
-      console.log(`Full processing completed for deck ${deckId}`)
-      return { success: true, transcript: mockTranscript }
       
     } catch (error) {
       console.error('Transcription error:', error)
@@ -149,74 +114,13 @@ export const generateSlides = action({
     console.log(`Starting slide generation for deck ${deckId}`)
     
     try {
-      // Simulate realistic processing time for slide generation
-      await new Promise(resolve => setTimeout(resolve, 3000))
+      // TODO: Implement real AI slide generation service integration
+      // 1. Send transcript to AI service (e.g., OpenAI GPT, Anthropic Claude)
+      // 2. Process AI response and extract slide structure
+      // 3. Validate and sanitize slide content
+      // 4. Create slides in database
       
-      // In a real implementation, you would send the transcript to Claude API
-      // For hackathon demo, we'll generate mock slides based on the transcript
-      
-      const mockSlides = [
-        {
-          title: "Voice-to-Slide Generator",
-          content: "• Innovative AI-powered presentation creation\n• Transform spoken content into professional slides\n• Save hours of presentation preparation time",
-          speakerNotes: "Welcome slide introducing our voice-to-slide generator. Emphasize the innovation and time-saving benefits."
-        },
-        {
-          title: "The Problem We Solve",
-          content: "• Professionals struggle with quick presentation creation\n• Great ideas but limited formatting time\n• Need for efficient content organization",
-          speakerNotes: "Explain the pain points that motivated us to create this solution. Connect with audience's experiences."
-        },
-        {
-          title: "Our Solution",
-          content: "• Advanced AI transcription technology\n• Automatic slide structure generation\n• Simple 3-step process: Record → Upload → Present",
-          speakerNotes: "Walk through the solution components. Demonstrate how simple the process is for users."
-        },
-        {
-          title: "Key Features",
-          content: "• Automatic speech transcription\n• Intelligent slide generation\n• Customizable templates\n• Real-time collaboration",
-          speakerNotes: "Highlight the main features that differentiate us from competitors. Focus on the AI intelligence."
-        },
-        {
-          title: "Market Opportunity",
-          content: "• Millions of professionals create presentations daily\n• Target: Business executives, educators, consultants\n• Large addressable market for productivity tools",
-          speakerNotes: "Present the market size and opportunity. Show the broad appeal across different professional segments."
-        },
-        {
-          title: "Thank You",
-          content: "• Questions & Discussion\n• Ready to demonstrate the platform\n• Contact us for beta access",
-          speakerNotes: "Closing slide. Be prepared for questions about technical implementation and pricing."
-        }
-      ]
-
-      console.log(`Creating ${mockSlides.length} slides for deck ${deckId}`)
-
-      // Create slides in the database with error handling for each slide
-      for (let i = 0; i < mockSlides.length; i++) {
-        const slide = mockSlides[i]
-        try {
-          await ctx.runMutation(api.slides.createSlide, {
-            deckId,
-            title: slide.title,
-            content: slide.content,
-            speakerNotes: slide.speakerNotes,
-            order: i + 1,
-          })
-          console.log(`Created slide ${i + 1}/${mockSlides.length} for deck ${deckId}`)
-        } catch (slideError) {
-          console.error(`Error creating slide ${i + 1}:`, slideError)
-          throw new Error(`Failed to create slide "${slide.title}". Please try again.`)
-        }
-      }
-
-      // Update deck status to completed
-      await ctx.runMutation(api.files.updateDeck, {
-        deckId,
-        status: 'completed',
-        totalSlides: mockSlides.length,
-      })
-
-      console.log(`Slide generation completed successfully for deck ${deckId}`)
-      return { success: true, slidesCount: mockSlides.length }
+      throw new Error('AI slide generation service not yet implemented. Please integrate with a real AI service like OpenAI GPT or Anthropic Claude.')
       
     } catch (error) {
       console.error('Slide generation error:', error)

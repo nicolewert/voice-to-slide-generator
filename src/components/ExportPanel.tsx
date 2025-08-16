@@ -3,22 +3,31 @@
 import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Download, FileText, FileImage, Loader2 } from 'lucide-react'
+import { Download, FileText, FileImage, Loader2, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface ExportPanelProps {
   deckId: string
+  slideCount?: number
   onExport?: (type: 'html' | 'pdf', success: boolean) => void
   className?: string
 }
 
-export function ExportPanel({ deckId, onExport, className }: ExportPanelProps) {
+export function ExportPanel({ deckId, slideCount = 0, onExport, className }: ExportPanelProps) {
   const [isExportingHTML, setIsExportingHTML] = useState(false)
   const [isExportingPDF, setIsExportingPDF] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
   const [exportSuccess, setExportSuccess] = useState<string | null>(null)
 
+  // Export validation
+  const canExport = slideCount >= 3
+
   const handleExport = async (type: 'html' | 'pdf') => {
+    if (!canExport) {
+      setExportError(`Export requires at least 3 slides. Current: ${slideCount}`)
+      return
+    }
+
     const setLoading = type === 'html' ? setIsExportingHTML : setIsExportingPDF
     setLoading(true)
     setExportError(null)
@@ -104,7 +113,7 @@ export function ExportPanel({ deckId, onExport, className }: ExportPanelProps) {
               variant="outline"
               className="w-full"
               onClick={() => handleExport('html')}
-              disabled={isExportingHTML || isExportingPDF}
+              disabled={!canExport || isExportingHTML || isExportingPDF}
             >
               {isExportingHTML ? (
                 <>
@@ -133,7 +142,7 @@ export function ExportPanel({ deckId, onExport, className }: ExportPanelProps) {
               variant="default"
               className="w-full"
               onClick={() => handleExport('pdf')}
-              disabled={isExportingHTML || isExportingPDF}
+              disabled={!canExport || isExportingHTML || isExportingPDF}
             >
               {isExportingPDF ? (
                 <>
@@ -157,11 +166,11 @@ export function ExportPanel({ deckId, onExport, className }: ExportPanelProps) {
               <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
               <div>
                 <div className="text-sm font-medium text-amber-800">
-                  Export requires at least 5 slides
+                  Export requires at least 3 slides
                 </div>
                 <div className="text-xs text-amber-700 mt-1">
                   This presentation currently has {slideCount} slide{slideCount === 1 ? '' : 's'}. 
-                  Add {5 - slideCount} more slide{5 - slideCount === 1 ? '' : 's'} to enable export functionality.
+                  Add {3 - slideCount} more slide{3 - slideCount === 1 ? '' : 's'} to enable export functionality.
                 </div>
               </div>
             </div>

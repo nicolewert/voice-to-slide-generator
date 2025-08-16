@@ -16,9 +16,6 @@ import {
 } from '@/components/ui/dialog';
 
 const NAV_ITEMS = [
-    { href: '/', label: 'Home' },
-    { href: '/create-deck', label: 'Create Deck' },
-    { href: '/recent-decks', label: 'Recent Decks' }
 ];
 
 export const Navigation: React.FC = () => {
