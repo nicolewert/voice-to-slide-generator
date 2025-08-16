@@ -150,6 +150,24 @@ export function ExportPanel({ deckId, onExport, className }: ExportPanelProps) {
           </div>
         </div>
 
+        {/* Slide Count Warning */}
+        {!canExport && (
+          <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <div className="text-sm font-medium text-amber-800">
+                  Export requires at least 5 slides
+                </div>
+                <div className="text-xs text-amber-700 mt-1">
+                  This presentation currently has {slideCount} slide{slideCount === 1 ? '' : 's'}. 
+                  Add {5 - slideCount} more slide{5 - slideCount === 1 ? '' : 's'} to enable export functionality.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {(isExportingHTML || isExportingPDF) && (
           <div className="mt-4 p-4 bg-muted/50 rounded-lg">
             <div className="flex items-center gap-2 text-sm">

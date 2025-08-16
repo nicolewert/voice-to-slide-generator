@@ -17,6 +17,19 @@ export async function GET(
       return NextResponse.json({ error: 'Deck ID is required' }, { status: 400 })
     }
 
+    // Get deck with slides to check slide count
+    const deck = await convex.query(api.decks.getDeckWithSlides, { deckId })
+    
+    if (!deck) {
+      return NextResponse.json({ error: 'Deck not found' }, { status: 404 })
+    }
+
+    if (!deck.slides || deck.slides.length < 5) {
+      return NextResponse.json({ 
+        error: 'Export requires at least 5 slides. This deck has ' + (deck.slides?.length || 0) + ' slides.' 
+      }, { status: 400 })
+    }
+
     // Call Convex action to generate HTML
     const result = await convex.action(api.actions.exportDeckHTML, {
       deckId,
@@ -26,8 +39,7 @@ export async function GET(
       return NextResponse.json({ error: 'Failed to generate HTML export' }, { status: 500 })
     }
 
-    // Get deck title for filename
-    const deck = await convex.query(api.decks.getDeckById, { deckId })
+    // Use deck title for filename (already fetched above)
     const filename = `${deck?.title || 'presentation'}.html`
       .replace(/[^a-z0-9]/gi, '_')
       .toLowerCase()

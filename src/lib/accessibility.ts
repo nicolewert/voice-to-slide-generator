@@ -162,12 +162,13 @@ export function isActivationKey(key: string): boolean {
 }
 
 export function isArrowKey(key: string): boolean {
-  return [
+  const arrowKeys = [
     KeyboardCodes.ARROW_UP,
     KeyboardCodes.ARROW_DOWN,
     KeyboardCodes.ARROW_LEFT,
     KeyboardCodes.ARROW_RIGHT,
-  ].includes(key as keyof typeof KeyboardCodes)
+  ]
+  return arrowKeys.includes(key as string)
 }
 
 // ARIA attributes helpers

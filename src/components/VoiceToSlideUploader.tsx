@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useMutation, useAction } from 'convex/react'
 import { api } from '../../convex/_generated/api'
-import { AudioUploader } from './AudioUploader'
+import { AudioInputSelector } from './AudioInputSelector'
 import { LoadingSpinner } from './LoadingSpinner'
 import { ErrorDisplay } from './ErrorDisplay'
 
@@ -184,10 +184,11 @@ export function VoiceToSlideUploader({ onDeckCreated, className }: VoiceToSlideU
           )}
         </div>
       ) : (
-        <AudioUploader
+        <AudioInputSelector
           onUploadStart={handleUploadStart}
           onUploadComplete={handleUploadComplete}
           onError={handleError}
+          maxDurationSeconds={600} // 10 minutes max for voice recording
         />
       )}
     </div>

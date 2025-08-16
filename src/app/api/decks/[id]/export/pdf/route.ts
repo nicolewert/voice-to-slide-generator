@@ -20,6 +20,19 @@ export async function GET(
       return NextResponse.json({ error: 'Deck ID is required' }, { status: 400 })
     }
 
+    // Get deck with slides to check slide count  
+    const deck = await convex.query(api.decks.getDeckWithSlides, { deckId })
+    
+    if (!deck) {
+      return NextResponse.json({ error: 'Deck not found' }, { status: 404 })
+    }
+
+    if (!deck.slides || deck.slides.length < 5) {
+      return NextResponse.json({ 
+        error: 'Export requires at least 5 slides. This deck has ' + (deck.slides?.length || 0) + ' slides.' 
+      }, { status: 400 })
+    }
+
     // Get HTML content from Convex action
     const result = await convex.action(api.actions.exportDeckHTML, {
       deckId,
@@ -31,8 +44,7 @@ export async function GET(
       }, { status: 500 })
     }
 
-    // Get deck title for filename with better sanitization
-    const deck = await convex.query(api.decks.getDeckById, { deckId })
+    // Get deck title for filename with better sanitization (using deck already fetched above)
     const sanitizedTitle = (deck?.title || 'presentation')
       .replace(/[^\w\s-]/g, '') // Remove special chars except word chars, spaces, hyphens
       .replace(/\s+/g, '_')     // Replace spaces with underscores
