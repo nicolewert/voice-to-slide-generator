@@ -64,6 +64,264 @@
 }
 
 body {
-  background-color: hsl(var(--background));
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(259, 30%, 97%) 100%);
+  min-height: 100vh;
   color: hsl(var(--foreground));
+  scroll-behavior: smooth;
+}
+
+/* Enhanced animations and transitions */
+@layer utilities {
+  /* Smooth transitions for all interactive elements */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .transition-bounce {
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  /* Elegant hover states */
+  .hover-lift {
+    @apply transition-smooth;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 60px rgba(103, 58, 183, 0.15), 0 8px 24px rgba(103, 58, 183, 0.08);
+  }
+
+  /* Luxury shadow variants */
+  .shadow-luxury {
+    box-shadow: 0 20px 60px rgba(103, 58, 183, 0.1), 0 8px 24px rgba(103, 58, 183, 0.05);
+  }
+  
+  .shadow-luxury-lg {
+    box-shadow: 0 30px 80px rgba(103, 58, 183, 0.15), 0 12px 32px rgba(103, 58, 183, 0.08);
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-luxury {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+  }
+  
+  .bg-gradient-gold {
+    background: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(48, 80%, 75%) 100%);
+  }
+  
+  .bg-gradient-subtle {
+    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(259, 30%, 97%) 100%);
+  }
+
+  /* Loading animations */
+  .pulse-luxury {
+    animation: pulse-luxury 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse-luxury {
+    0%, 100% {
+      opacity: 1;
+      background-color: hsl(var(--primary) / 0.1);
+    }
+    50% {
+      opacity: 0.7;
+      background-color: hsl(var(--primary) / 0.2);
+    }
+  }
+
+  /* Slide-in animations */
+  .slide-in-up {
+    animation: slide-in-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  
+  @keyframes slide-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .slide-in-right {
+    animation: slide-in-right 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  
+  @keyframes slide-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Fade-in animation */
+  .fade-in {
+    animation: fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Scale-in animation */
+  .scale-in {
+    animation: scale-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Shimmer effect for loading states */
+  .shimmer {
+    background: linear-gradient(90deg, 
+      hsl(var(--muted) / 0.3) 0%, 
+      hsl(var(--primary) / 0.1) 50%, 
+      hsl(var(--muted) / 0.3) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* Focus styles */
+  .focus-luxury:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.3);
+    border-color: hsl(var(--primary));
+  }
+
+  /* Typography utilities */
+  .text-gradient-luxury {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .text-gradient-gold {
+    background: linear-gradient(135deg, hsl(var(--secondary)), hsl(48, 80%, 60%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* Component-specific styles */
+@layer components {
+  /* Enhanced button styles */
+  .btn-luxury {
+    @apply bg-gradient-luxury text-white font-medium px-6 py-3 rounded-xl;
+    @apply transition-smooth hover-lift focus-luxury;
+    @apply shadow-luxury hover:shadow-luxury-lg;
+  }
+  
+  .btn-luxury-outline {
+    @apply border-2 border-primary text-primary bg-transparent font-medium px-6 py-3 rounded-xl;
+    @apply transition-smooth hover:bg-primary hover:text-white focus-luxury;
+    @apply hover-lift;
+  }
+
+  /* Enhanced card styles */
+  .card-luxury {
+    @apply bg-white/95 border border-border/50 rounded-2xl p-6;
+    @apply shadow-luxury backdrop-blur-sm;
+    @apply transition-smooth hover-lift;
+  }
+
+  /* Form input styles */
+  .input-luxury {
+    @apply w-full px-4 py-3 bg-white/80 border border-border rounded-xl;
+    @apply transition-smooth focus-luxury;
+    @apply placeholder:text-muted-foreground;
+  }
+
+  /* Loading spinner */
+  .spinner-luxury {
+    @apply w-8 h-8 border-3 border-primary/20 border-t-primary rounded-full;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+/* Responsive breakpoint utilities */
+@media (max-width: 768px) {
+  .slide-in-up {
+    animation-duration: 0.3s;
+  }
+  
+  .hover-lift:hover {
+    transform: none; /* Disable hover effects on mobile */
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --primary: 259 100% 40%;
+    --secondary: 48 100% 50%;
+    --border: 259 30% 70%;
+  }
+}
+
+/* Print styles for exported content */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .card-luxury {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
 }

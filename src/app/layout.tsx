@@ -4,6 +4,10 @@ import "./globals.css";
 import { ConvexClientProvider } from "@/providers/ConvexClientProvider";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { ToastProvider } from "@/components/Toast/ToastContext";
+import { ToastContainer } from "@/components/Toast/ToastContainer";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import SkipLinks from "@/components/SkipLinks";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,15 +52,21 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${inter.variable} ${spaceGrotesk.variable} antialiased font-inter`}
       >
-        <ConvexClientProvider>
-          <div className="min-h-screen flex flex-col">
-            <Navigation />
-            <main className="flex-1 pt-20">
-              {children}
-            </main>
-            <Footer />
-          </div>
-        </ConvexClientProvider>
+        <ErrorBoundary>
+          <ConvexClientProvider>
+            <ToastProvider>
+              <SkipLinks />
+              <div className="min-h-screen flex flex-col">
+                <Navigation />
+                <main id="main-content" className="flex-1 pt-20" tabIndex={-1}>
+                  {children}
+                </main>
+                <Footer />
+                <ToastContainer />
+              </div>
+            </ToastProvider>
+          </ConvexClientProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

@@ -5,12 +5,14 @@ interface ErrorDisplayProps {
   error: string;
   onRetry?: () => void;
   className?: string;
+  children?: React.ReactNode;
 }
 
 export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ 
   error, 
   onRetry, 
-  className = '' 
+  className = '',
+  children
 }) => {
   return (
     <div 
@@ -61,6 +63,8 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
           Retry Upload
         </Button>
       )}
+      
+      {children}
     </div>
   );
 };

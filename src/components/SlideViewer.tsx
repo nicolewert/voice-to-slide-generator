@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { Card } from './ui/card';
 import SlideCard from './SlideCard';
-import { Navigation } from './Navigation';
+import { SlideNavigation } from './SlideNavigation';
 import { Skeleton } from './ui/skeleton';
 import { ExportPanel } from './ExportPanel';
 
@@ -144,7 +144,7 @@ export const SlideViewer: React.FC<SlideViewerProps> = ({
       />
 
       {/* Navigation Controls */}
-      <Navigation
+      <SlideNavigation
         currentSlide={currentSlide}
         totalSlides={deck.slides.length}
         onPrevious={goToPreviousSlide}

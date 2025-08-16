@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Test configuration
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'http://localhost:3007';
 const SCREENSHOT_DIR = path.join(__dirname, '../screenshots');
 const TIMEOUT = 10000;
 

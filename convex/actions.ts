@@ -2,45 +2,120 @@ import { v } from 'convex/values'
 import { action } from './_generated/server'
 import { api } from './_generated/api'
 
+// Enhanced error handling for Convex actions
+class ConvexActionError extends Error {
+  constructor(
+    public type: 'transcription' | 'generation' | 'export' | 'network' | 'validation',
+    message: string,
+    public recoverable: boolean = true,
+    public originalError?: unknown
+  ) {
+    super(message)
+    this.name = 'ConvexActionError'
+  }
+}
+
+async function withRetry<T>(
+  operation: () => Promise<T>,
+  maxAttempts: number = 3,
+  baseDelay: number = 1000,
+  context: string = 'Operation'
+): Promise<T> {
+  let lastError: unknown
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await operation()
+    } catch (error) {
+      lastError = error
+      
+      // Don't retry validation errors
+      if (error instanceof ConvexActionError && error.type === 'validation') {
+        throw error
+      }
+
+      if (attempt === maxAttempts) {
+        break
+      }
+
+      // Exponential backoff with jitter
+      const delay = Math.min(baseDelay * Math.pow(2, attempt - 1), 10000)
+      const jitteredDelay = delay * (0.5 + Math.random() * 0.5)
+      
+      console.warn(`${context} failed (attempt ${attempt}/${maxAttempts}). Retrying in ${Math.round(jitteredDelay)}ms...`)
+      await new Promise(resolve => setTimeout(resolve, jitteredDelay))
+    }
+  }
+
+  throw lastError
+}
+
 export const transcribeAudio = action({
   args: { 
     deckId: v.id('decks'),
     audioUrl: v.string(),
   },
   handler: async (ctx, args): Promise<{ success: boolean; transcript: string }> => {
-    try {
-      // Update deck status to processing
-      await ctx.runMutation(api.decks.updateDeck, {
-        id: args.deckId,
-        status: 'processing',
-      })
+    return await withRetry(async () => {
+      try {
+        // Validate inputs
+        if (!args.audioUrl || !args.audioUrl.trim()) {
+          throw new ConvexActionError('validation', 'Audio URL is required', false)
+        }
 
-      // TODO: Integrate with actual transcription service (e.g., OpenAI Whisper, AssemblyAI)
-      // For now, we'll simulate transcription
-      const simulatedTranscript = `This is a simulated transcript for the audio file at ${args.audioUrl}. 
-      In a real implementation, this would be the actual transcribed text from the audio file.
-      The transcript would contain the spoken content that will be used to generate slides.`
+        // Update deck status to processing
+        await ctx.runMutation(api.decks.updateDeck, {
+          id: args.deckId,
+          status: 'processing',
+        })
 
-      // Update deck with transcript
-      await ctx.runMutation(api.decks.updateDeck, {
-        id: args.deckId,
-        transcript: simulatedTranscript,
-        status: 'completed',
-      })
+        // TODO: Integrate with actual transcription service (e.g., OpenAI Whisper, AssemblyAI, Claude)
+        // For now, we'll simulate transcription with enhanced error handling
+        const simulatedTranscript = await simulateTranscription(args.audioUrl)
 
-      return { success: true, transcript: simulatedTranscript }
-    } catch (error: any) {
-      // Update deck with error status
-      await ctx.runMutation(api.decks.updateDeck, {
-        id: args.deckId,
-        status: 'error',
-        errorMessage: `Transcription failed: ${error?.message || 'Unknown error'}`,
-      })
+        // Update deck with transcript
+        await ctx.runMutation(api.decks.updateDeck, {
+          id: args.deckId,
+          transcript: simulatedTranscript,
+          status: 'completed',
+        })
 
-      throw error
-    }
+        console.log(`Transcription successful for deck ${args.deckId}`)
+        return { success: true, transcript: simulatedTranscript }
+      } catch (error: any) {
+        console.error(`Transcription failed for deck ${args.deckId}:`, error)
+        
+        // Update deck with error status
+        const errorMessage = error instanceof ConvexActionError 
+          ? error.message 
+          : `Transcription failed: ${error?.message || 'Unknown error'}`
+
+        await ctx.runMutation(api.decks.updateDeck, {
+          id: args.deckId,
+          status: 'error',
+          errorMessage,
+        })
+
+        throw new ConvexActionError('transcription', errorMessage, true, error)
+      }
+    }, 2, 2000, 'Audio transcription')
   },
 })
+
+// Simulated transcription function with potential failures
+async function simulateTranscription(audioUrl: string): Promise<string> {
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000))
+  
+  // Simulate occasional failures for testing
+  if (Math.random() < 0.1) {
+    throw new Error('Simulated transcription service failure')
+  }
+
+  return `This is a simulated transcript for the audio file at ${audioUrl}. 
+In a real implementation, this would be the actual transcribed text from the audio file using a service like OpenAI Whisper, AssemblyAI, or Claude's audio processing capabilities.
+The transcript would contain the spoken content that will be used to generate slides with proper punctuation, formatting, and clarity.`
+}
 
 export const generateSlides = action({
   args: { 
@@ -48,68 +123,113 @@ export const generateSlides = action({
     transcript: v.string(),
   },
   handler: async (ctx, args): Promise<{ success: boolean; slideIds: any[] }> => {
-    try {
-      // Update deck status to processing
-      await ctx.runMutation(api.decks.updateDeck, {
-        id: args.deckId,
-        status: 'processing',
-      })
+    return await withRetry(async () => {
+      try {
+        // Validate inputs
+        if (!args.transcript || args.transcript.trim().length < 10) {
+          throw new ConvexActionError('validation', 'Transcript must be at least 10 characters long', false)
+        }
 
-      // TODO: Integrate with AI service (e.g., OpenAI GPT, Anthropic Claude) for slide generation
-      // For now, we'll simulate slide generation based on transcript
-      const simulatedSlides = [
-        {
-          title: 'Introduction',
-          content: 'Welcome to the presentation. This slide introduces the main topic.',
-          speakerNotes: 'Start with a warm welcome and introduce yourself.',
-          order: 0,
-        },
-        {
-          title: 'Key Points',
-          content: 'Here are the main points we will cover in this presentation.',
-          speakerNotes: 'Elaborate on each point with examples from the transcript.',
-          order: 1,
-        },
-        {
-          title: 'Conclusion',
-          content: 'Thank you for your attention. Questions are welcome.',
-          speakerNotes: 'Summarize the key takeaways and open for Q&A.',
-          order: 2,
-        },
-      ]
-
-      // Create slides in the database
-      const slideIds: any[] = []
-      for (const slide of simulatedSlides) {
-        const slideId = await ctx.runMutation(api.slides.createSlide, {
-          deckId: args.deckId,
-          title: slide.title,
-          content: slide.content,
-          speakerNotes: slide.speakerNotes,
-          order: slide.order,
+        // Update deck status to processing
+        await ctx.runMutation(api.decks.updateDeck, {
+          id: args.deckId,
+          status: 'processing',
         })
-        slideIds.push(slideId)
+
+        // TODO: Integrate with AI service (e.g., OpenAI GPT, Anthropic Claude) for slide generation
+        // For now, we'll simulate slide generation with enhanced error handling
+        const simulatedSlides = await simulateSlideGeneration(args.transcript)
+
+        // Create slides in the database
+        const slideIds: any[] = []
+        for (const slide of simulatedSlides) {
+          const slideId = await ctx.runMutation(api.slides.createSlide, {
+            deckId: args.deckId,
+            title: slide.title,
+            content: slide.content,
+            speakerNotes: slide.speakerNotes,
+            order: slide.order,
+          })
+          slideIds.push(slideId)
+        }
+
+        // Update deck with final slide count and completion status
+        await ctx.runMutation(api.decks.updateDeck, {
+          id: args.deckId,
+          status: 'completed',
+          totalSlides: slideIds.length,
+        })
+
+        console.log(`Slide generation successful for deck ${args.deckId}, created ${slideIds.length} slides`)
+        return { success: true, slideIds }
+      } catch (error: any) {
+        console.error(`Slide generation failed for deck ${args.deckId}:`, error)
+        
+        // Update deck with error status
+        const errorMessage = error instanceof ConvexActionError 
+          ? error.message 
+          : `Slide generation failed: ${error?.message || 'Unknown error'}`
+
+        await ctx.runMutation(api.decks.updateDeck, {
+          id: args.deckId,
+          status: 'error',
+          errorMessage,
+        })
+
+        throw new ConvexActionError('generation', errorMessage, true, error)
       }
-
-      // Update deck status to completed
-      await ctx.runMutation(api.decks.updateDeck, {
-        id: args.deckId,
-        status: 'completed',
-      })
-
-      return { success: true, slideIds }
-    } catch (error: any) {
-      // Update deck with error status
-      await ctx.runMutation(api.decks.updateDeck, {
-        id: args.deckId,
-        status: 'error',
-        errorMessage: `Slide generation failed: ${error?.message || 'Unknown error'}`,
-      })
-
-      throw error
-    }
+    }, 3, 1500, 'Slide generation')
   },
 })
+
+// Simulated slide generation with enhanced error handling
+async function simulateSlideGeneration(transcript: string): Promise<Array<{
+  title: string
+  content: string
+  speakerNotes: string
+  order: number
+}>> {
+  // Simulate AI processing delay
+  await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000))
+  
+  // Simulate occasional failures for testing
+  if (Math.random() < 0.05) {
+    throw new Error('Simulated AI service failure')
+  }
+
+  // Generate slides based on transcript length and content
+  const wordCount = transcript.split(' ').length
+  const slideCount = Math.max(3, Math.min(8, Math.ceil(wordCount / 50)))
+
+  const slides = [
+    {
+      title: 'Introduction',
+      content: `<h2>Welcome to the Presentation</h2><p>Today we'll explore the key insights from our discussion.</p>`,
+      speakerNotes: 'Start with a warm welcome and introduce yourself. Set expectations for the presentation.',
+      order: 0,
+    }
+  ]
+
+  // Generate middle slides based on content
+  for (let i = 1; i < slideCount - 1; i++) {
+    slides.push({
+      title: `Key Point ${i}`,
+      content: `<h2>Important Insight #${i}</h2><p>This slide covers significant points from the transcript, elaborating on the main themes discussed.</p><ul><li>Key insight from analysis</li><li>Supporting evidence</li><li>Practical implications</li></ul>`,
+      speakerNotes: `Elaborate on point ${i} with examples from the transcript. Connect this to the overall theme and provide context for the audience.`,
+      order: i,
+    })
+  }
+
+  // Add conclusion slide
+  slides.push({
+    title: 'Conclusion',
+    content: '<h2>Thank You</h2><p>We\'ve covered the essential points from our discussion. Questions and feedback are welcome.</p>',
+    speakerNotes: 'Summarize the key takeaways, provide a clear conclusion, and open for Q&A. Thank the audience for their attention.',
+    order: slideCount - 1,
+  })
+
+  return slides
+}
 
 // Simple HTML escaping function to prevent XSS
 function escapeHtml(unsafe: string): string {
@@ -124,15 +244,20 @@ function escapeHtml(unsafe: string): string {
 export const exportDeckHTML = action({
   args: { deckId: v.id('decks') },
   handler: async (ctx, args): Promise<{ success: boolean; html: string }> => {
-    try {
-      // Get deck with slides
-      const deckWithSlides: any = await ctx.runQuery(api.decks.getDeckWithSlides, {
-        deckId: args.deckId,
-      })
+    return await withRetry(async () => {
+      try {
+        // Get deck with slides
+        const deckWithSlides: any = await ctx.runQuery(api.decks.getDeckWithSlides, {
+          deckId: args.deckId,
+        })
 
-      if (!deckWithSlides) {
-        throw new Error('Deck not found')
-      }
+        if (!deckWithSlides) {
+          throw new ConvexActionError('validation', 'Deck not found', false)
+        }
+
+        if (!deckWithSlides.slides || deckWithSlides.slides.length === 0) {
+          throw new ConvexActionError('validation', 'Deck has no slides to export', false)
+        }
 
       // Generate reveal.js HTML export with luxury SaaS theme
       const html: string = `
@@ -281,44 +406,65 @@ export const exportDeckHTML = action({
 </body>
 </html>`
 
-      return { success: true, html }
-    } catch (error: any) {
-      throw new Error(`HTML export failed: ${error?.message || 'Unknown error'}`)
-    }
+        console.log(`HTML export successful for deck ${args.deckId}`)
+        return { success: true, html }
+      } catch (error: any) {
+        console.error(`HTML export failed for deck ${args.deckId}:`, error)
+        
+        const errorMessage = error instanceof ConvexActionError 
+          ? error.message 
+          : `HTML export failed: ${error?.message || 'Unknown error'}`
+
+        throw new ConvexActionError('export', errorMessage, true, error)
+      }
+    }, 2, 1000, 'HTML export')
   },
 })
 
 export const exportDeckPDF = action({
   args: { deckId: v.id('decks') },
   handler: async (ctx, args): Promise<{ success: boolean; pdfBuffer: string }> => {
-    try {
-      // Get deck with slides
-      const deckWithSlides: any = await ctx.runQuery(api.decks.getDeckWithSlides, {
-        deckId: args.deckId,
-      })
+    return await withRetry(async () => {
+      try {
+        // Get deck with slides
+        const deckWithSlides: any = await ctx.runQuery(api.decks.getDeckWithSlides, {
+          deckId: args.deckId,
+        })
 
-      if (!deckWithSlides) {
-        throw new Error('Deck not found')
+        if (!deckWithSlides) {
+          throw new ConvexActionError('validation', 'Deck not found', false)
+        }
+
+        if (!deckWithSlides.slides || deckWithSlides.slides.length === 0) {
+          throw new ConvexActionError('validation', 'Deck has no slides to export', false)
+        }
+
+        // First get the HTML version for PDF conversion
+        const htmlResult = await ctx.runAction(api.actions.exportDeckHTML, {
+          deckId: args.deckId,
+        })
+
+        if (!htmlResult.success || !htmlResult.html) {
+          throw new ConvexActionError('export', 'Failed to generate HTML for PDF conversion', true)
+        }
+
+        // For PDF generation, we'll return the HTML to be processed by the API route
+        // The actual PDF generation will happen in the Next.js API route using Playwright/Puppeteer
+        // This approach allows us to use server-side resources more efficiently
+        console.log(`PDF export preparation successful for deck ${args.deckId}`)
+        return { 
+          success: true, 
+          pdfBuffer: Buffer.from(htmlResult.html).toString('base64')
+        }
+      } catch (error: any) {
+        console.error(`PDF export failed for deck ${args.deckId}:`, error)
+        
+        const errorMessage = error instanceof ConvexActionError 
+          ? error.message 
+          : `PDF export failed: ${error?.message || 'Unknown error'}`
+
+        throw new ConvexActionError('export', errorMessage, true, error)
       }
-
-      // First get the HTML version for PDF conversion
-      const htmlResult = await ctx.runAction(api.actions.exportDeckHTML, {
-        deckId: args.deckId,
-      })
-
-      if (!htmlResult.success) {
-        throw new Error('Failed to generate HTML for PDF conversion')
-      }
-
-      // For PDF generation, we'll return the HTML to be processed by the API route
-      // The actual PDF generation will happen in the Next.js API route using Puppeteer
-      // This approach allows us to use server-side resources more efficiently
-      return { 
-        success: true, 
-        pdfBuffer: Buffer.from(htmlResult.html).toString('base64')
-      }
-    } catch (error: any) {
-      throw new Error(`PDF export failed: ${error?.message || 'Unknown error'}`)
-    }
+    }, 2, 1500, 'PDF export')
   },
 })
