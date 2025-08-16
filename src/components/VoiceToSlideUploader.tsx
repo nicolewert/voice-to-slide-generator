@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useMutation } from 'convex/react'
+import { useMutation, useAction } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import { AudioUploader } from './AudioUploader'
 import { LoadingSpinner } from './LoadingSpinner'
@@ -19,6 +19,7 @@ export function VoiceToSlideUploader({ onDeckCreated }: VoiceToSlideUploaderProp
 
   const generateUploadUrl = useMutation(api.files.generateUploadUrl)
   const createDeckWithAudio = useMutation(api.files.createDeckWithAudio)
+  const transcribeAudio = useAction(api.ai.transcribeAudio)
 
   const handleUploadStart = () => {
     setIsUploading(true)
@@ -28,31 +29,78 @@ export function VoiceToSlideUploader({ onDeckCreated }: VoiceToSlideUploaderProp
 
   const handleUploadComplete = async (file: File) => {
     try {
-      // Step 1: Generate upload URL from Convex
-      const uploadUrl = await generateUploadUrl({})
+      console.log('Starting upload process for:', file.name)
       
-      // Step 2: Upload file to Convex storage
-      const result = await fetch(uploadUrl, {
+      // Step 1: Generate upload URL from Convex with retry logic
+      let uploadUrl: string
+      let retryCount = 0
+      const maxRetries = 3
+      
+      while (retryCount < maxRetries) {
+        try {
+          const result = await generateUploadUrl({})
+          uploadUrl = result
+          break
+        } catch (urlError) {
+          retryCount++
+          if (retryCount >= maxRetries) {
+            throw new Error('Failed to generate upload URL after multiple attempts')
+          }
+          console.log(`Retrying upload URL generation (attempt ${retryCount}/${maxRetries})`)
+          await new Promise(resolve => setTimeout(resolve, 1000 * retryCount))
+        }
+      }
+      
+      setUploadProgress(25)
+      
+      // Step 2: Upload file to Convex storage with timeout
+      const uploadPromise = fetch(uploadUrl!, {
         method: 'POST',
         headers: { 'Content-Type': file.type },
         body: file,
       })
       
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('File upload timeout - please try with a smaller file')), 60000)
+      )
+      
+      const result = await Promise.race([uploadPromise, timeoutPromise]) as Response
+      
       if (!result.ok) {
-        throw new Error('Failed to upload file to storage')
+        const errorText = await result.text().catch(() => 'Unknown error')
+        throw new Error(`Failed to upload file: ${result.status} ${errorText}`)
       }
       
       const { storageId } = await result.json()
+      setUploadProgress(50)
+      
+      console.log('File uploaded successfully, storageId:', storageId)
       
       // Step 3: Create deck with audio file
-      const title = deckTitle || file.name.replace(/\.[^/.]+$/, '')
+      const title = deckTitle.trim() || file.name.replace(/\.[^/.]+$/, '')
       const { deckId } = await createDeckWithAudio({
         title,
         audioFileId: storageId,
       })
       
-      setIsUploading(false)
+      setUploadProgress(75)
+      console.log('Deck created successfully, deckId:', deckId)
+      
+      // Step 4: Start AI processing (transcription and slide generation)
+      try {
+        await transcribeAudio({
+          deckId,
+          audioFileId: storageId,
+        })
+        console.log('AI processing completed successfully')
+      } catch (aiError) {
+        console.error('AI processing error:', aiError)
+        // Don't throw here - let the ProcessingStatus component handle display
+        // The deck is already created and the error status is set in the AI action
+      }
+      
       setUploadProgress(100)
+      setIsUploading(false)
       
       // Notify parent component
       if (onDeckCreated) {
@@ -61,8 +109,24 @@ export function VoiceToSlideUploader({ onDeckCreated }: VoiceToSlideUploaderProp
       
     } catch (err) {
       console.error('Upload error:', err)
-      setError(err instanceof Error ? err.message : 'Upload failed. Please try again.')
+      
+      let errorMessage = 'Upload failed. Please try again.'
+      
+      if (err instanceof Error) {
+        if (err.message.includes('timeout')) {
+          errorMessage = 'Upload timeout. Please try with a smaller file or check your internet connection.'
+        } else if (err.message.includes('generate upload URL')) {
+          errorMessage = 'Unable to prepare file upload. Please check your connection and try again.'
+        } else if (err.message.includes('Failed to upload file')) {
+          errorMessage = 'File upload failed. Please try again or use a different file format.'
+        } else {
+          errorMessage = err.message
+        }
+      }
+      
+      setError(errorMessage)
       setIsUploading(false)
+      setUploadProgress(0)
     }
   }
 

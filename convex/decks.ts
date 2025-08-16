@@ -1,11 +1,12 @@
 import { v } from 'convex/values'
 import { query, mutation } from './_generated/server'
 
-export const getDeck = query({
-  args: { id: v.id('decks') },
+export const getDeckById = query({
+  args: { deckId: v.id('decks') },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.id)
-  },
+    const deck = await ctx.db.get(args.deckId);
+    return deck ?? null;
+  }
 })
 
 export const getRecentDecks = query({
